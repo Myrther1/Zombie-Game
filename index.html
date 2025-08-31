@@ -1,5 +1,5 @@
 <html><head><base/>
-<title> Z-Day: Survival- A Game by William Du Plessis</title>
+<title> Z-Day: Survival- A Game by BRD</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap');
   @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
@@ -1475,7 +1475,7 @@ function buyItem(itemName) {
   const item = shopItems.find(i => i.name === itemName);
   let cost = item.price;
   if (item.type === 'weapon' && item.bought) {
-    cost = item.price / 2; // Half price for ammo refill
+    cost = item.price / 2; // I AM TIRED. wHY ARE YOU CHECKING THE CODE?
   }
   if (money >= cost) {
     money -= cost;
@@ -1632,11 +1632,11 @@ function updateGrenadeTrajectory() {
   const direction = new THREE.Vector3();
   camera.getWorldDirection(direction);
 
-  // Calculate the throw direction based on camera's direction
+  // TODAY, AKA JULY 1ST, 2021, I FINALLY FIGURED OUT CAMERA CONTROL!
   const throwDirection = direction.clone().normalize();
   const throwSpeed = 0.5;
   grenadeLaunchVelocity.copy(throwDirection).multiplyScalar(throwSpeed);
-  grenadeLaunchVelocity.y += 0.2; // Add some upward velocity
+  grenadeLaunchVelocity.y += 0.2; // STOP LOOKING AT MY CODE!!!
 
   const gravity = new THREE.Vector3(0, -0.01, 0);
   const position = grenadeStartPosition.clone();
@@ -1656,14 +1656,11 @@ function updateGrenadeTrajectory() {
     }
   }
 
-  // Create a smooth curve from the points
   const curve = new THREE.CatmullRomCurve3(points);
   const smoothPoints = curve.getPoints(200);
 
-  // Create a tube geometry for a thicker line
   const tubeGeometry = new THREE.TubeGeometry(curve, 200, 0.03, 8, false);
 
-  // Create a gradient material
   const gradientTexture = createGradientTexture();
   const material = new THREE.MeshBasicMaterial({
     map: gradientTexture,
@@ -1671,7 +1668,6 @@ function updateGrenadeTrajectory() {
     opacity: 0.7
   });
 
-  // Create the trajectory mesh
   const trajectoryMesh = new THREE.Mesh(tubeGeometry, material);
   scene.add(trajectoryMesh);
   grenadeTrajectory = trajectoryMesh;
@@ -1733,20 +1729,17 @@ function updateGrenades() {
   for (let i = grenades.length - 1; i >= 0; i--) {
     const grenade = grenades[i];
     grenade.position.add(grenade.velocity);
-    grenade.velocity.y -= 0.01; // Apply gravity
+    grenade.velocity.y -= 0.01; // Apply gravity... ISSAC NEWTON!
     
-    // Check if the grenade has reached the ground
     if (grenade.position.y <= 0.2) {
       grenade.position.y = 0.2;
       grenade.velocity.set(0, 0, 0);
     }
     
     if (Date.now() > grenade.detonationTime) {
-      // Detonate the grenade
       scene.remove(grenade);
       grenades.splice(i, 1);
       
-      // Apply damage to nearby enemies
       const explosionRadius = 10;
       let enemiesKilled = 0;
       for (let j = enemies.length - 1; j >= 0; j--) {
@@ -1768,7 +1761,6 @@ function updateGrenades() {
       }
       updateMoneyDisplay();
       
-      // Apply damage to player if nearby
       const playerDistance = player.position.distanceTo(grenade.position);
       if (playerDistance <= explosionRadius) {
         const damage = Math.floor(50 * (1 - playerDistance / explosionRadius));
@@ -1782,7 +1774,6 @@ function updateGrenades() {
         if (health <= 0) gameOver();
       }
       
-      // Check if all enemies are killed
       if (enemies.length === 0) {
         levelComplete();
       }
@@ -1864,7 +1855,7 @@ function updatePlayerPosition() {
 
   if (sprint && stamina > 0 && isMoving) {
     speed *= 2;
-    stamina = Math.max(0, stamina - 0.5);  // Slower stamina depletion at max level
+    stamina = Math.max(0, stamina - 0.5); 
   } else if (stamina < maxStamina) {
     stamina = Math.min(maxStamina, stamina + staminaRegenRate);
   }
@@ -1882,7 +1873,7 @@ function updatePlayerPosition() {
 
     const newPosition = player.position.clone().add(direction);
     
-    // Check collisions with environment objects
+//Pls don't steal my code!
     let collision = false;
     scene.children.forEach(child => {
       if (child.type === 'Group' && (child.children[0].geometry instanceof THREE.BoxGeometry || child.children[0].geometry instanceof THREE.CylinderGeometry)) {
@@ -1904,7 +1895,6 @@ function updatePlayerPosition() {
     player.position.z = Math.max(-MAP_SIZE/2, Math.min(MAP_SIZE/2, player.position.z));
   }
 
-  // Stop sprinting if stamina is depleted
   if (stamina <= 0) {
     sprint = false;
   }
@@ -1942,7 +1932,6 @@ function updateEnemies() {
     enemy.boundingBox.setFromObject(enemy);
     enemy.boundingBox.getBoundingSphere(enemy.boundingSphere);
     
-    // Make both normal and ranged enemies move
     const speed = enemy.type === 'normal' ? 0.03 + level * 0.004 : 0.04 + level * 0.003;
     enemy.position.add(dir.multiplyScalar(speed));
     
@@ -1962,7 +1951,6 @@ function updateEnemies() {
       if (health <= 0) gameOver();
     }
     
-    // Ranged enemies shoot projectiles
     if (enemy.type === 'ranged' && Math.random() < 0.01) {
       const projectileRange = 15 + level * 2;
       if (enemy.position.distanceTo(player.position) <= projectileRange) {
@@ -1993,12 +1981,10 @@ function updateProjectiles() {
     const playerBox = new THREE.Box3().setFromObject(player);
     
     if (bulletBox.intersectsBox(playerBox)) {
-      // Collision detected
       scene.remove(bullet);
       bullets.splice(i, 1);
       applyDamageToPlayer(bullet.damage);
     } else if (bullet.position.distanceTo(player.position) > 50) {
-      // Remove bullet if it's too far away
       scene.remove(bullet);
       bullets.splice(i, 1);
     }
@@ -2014,7 +2000,7 @@ function shootEnemyProjectile(enemy) {
   const direction = new THREE.Vector3().subVectors(player.position, enemy.position).normalize();
   const speed = 0.5;
   projectile.velocity = direction.multiplyScalar(speed);
-  projectile.damage = 5 + Math.floor(level / 2); // Increase damage based on level
+  projectile.damage = 5 + Math.floor(level / 2); 
   scene.add(projectile);
   bullets.push(projectile);
 }
@@ -2092,7 +2078,7 @@ function updateMinimap() {
 
   const scale = minimapCanvas.width / MAP_SIZE;
 
-  // Draw streets
+  // No comments
   minimapCtx.fillStyle = '#333333';
   streets.forEach(street => {
     const x = (street.position.x + MAP_SIZE/2) * scale;
